@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Little Lemon reservations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4d93a;--ink:#17352d;--panel:#17352d;--panel-ink:#fbf4c9;--chip:#24493f;--chip-on:#f4d93a;--chip-on-ink:#17352d;--err:#ffb59a;--paper:#fffdf0;--paper-ink:#17352d;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10241f;--ink:#f4d93a;--panel:#f4d93a;--panel-ink:#17352d;--chip:#e6c92d;--chip-on:#17352d;--chip-on-ink:#f4d93a;--err:#8f2508}}
+:root[data-theme="dark"]{--bg:#10241f;--ink:#f4d93a;--panel:#f4d93a;--panel-ink:#17352d;--chip:#e6c92d;--chip-on:#17352d;--chip-on-ink:#f4d93a;--err:#8f2508}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:1.05rem;line-height:1.5}
+.wrap{max-width:72rem;margin:0 auto;padding:1.25rem;display:grid;gap:2rem;grid-template-columns:1fr}
+@media(min-width:60rem){.wrap{grid-template-columns:1.1fr 1fr;gap:3.5rem;padding:2rem}}
+.mark{font-weight:800;letter-spacing:-.02em;font-size:1.2rem}
+h1{font-size:clamp(2.8rem,8vw,5.6rem);line-height:.92;letter-spacing:-.04em;font-weight:800;margin:1.5rem 0 1rem;font-stretch:75%}
+.lede{max-width:30rem;margin:0 0 2rem}
+.panel{background:var(--panel);color:var(--panel-ink);border-radius:1.5rem;padding:1.5rem}
+h2{font-size:1.6rem;letter-spacing:-.02em;margin:0 0 1rem}
+form{display:grid;gap:.4rem}
+label,legend{font-weight:700;margin-top:.8rem;padding:0}
+fieldset{border:0;margin:0;padding:0;min-width:0}
+input,select{font:inherit;width:100%;padding:.65rem .8rem;border-radius:.7rem;border:2px solid var(--panel-ink);background:transparent;color:inherit}
+select option{color:#17352d}
+input[aria-invalid=true],select[aria-invalid=true]{border-color:var(--err)}
+.chips{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.4rem}
+.chip{margin:0;position:relative}
+.chip input{position:absolute;opacity:0;width:100%;height:100%;inset:0;cursor:pointer}
+.chip span{display:block;padding:.45rem .9rem;border-radius:99px;border:2px solid var(--panel-ink);font-weight:700;font-variant-numeric:tabular-nums}
+.chip input:checked+span{background:var(--chip-on);color:var(--chip-on-ink);border-color:var(--chip-on)}
+.chip input:focus-visible+span,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--err);outline-offset:2px}
+.step{display:grid;grid-template-columns:3rem 1fr 3rem;gap:.5rem}
+.step input{text-align:center}
+button{font:inherit;font-weight:700;cursor:pointer;border-radius:.7rem;border:2px solid var(--panel-ink);background:transparent;color:inherit;padding:.6rem 1rem}
+.go{margin-top:1.2rem;background:var(--chip-on);color:var(--chip-on-ink);border-color:var(--chip-on);font-size:1.1rem;padding:.8rem}
+.err{margin:0;color:var(--err);font-weight:700}
+.hint{margin:.3rem 0 0;opacity:.85}
+.lab{border:2px solid var(--ink);border-radius:1.5rem;padding:1.25rem}
+.lab h2{font-size:1.25rem;margin-bottom:.6rem}
+.lab dl{display:grid;grid-template-columns:auto 1fr;gap:.3rem 1rem;margin:0 0 1rem}
+.lab dt{font-weight:700}.lab dd{margin:0;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.try{display:flex;flex-wrap:wrap;gap:.5rem}
+.try button{border-color:var(--ink);padding:.4rem .8rem;font-size:.95rem}
+.ticket{background:var(--paper);color:var(--paper-ink);border-radius:1rem;padding:1.5rem;animation:slip .5s ease-out}
+.ticket .big{font-size:2.4rem;font-weight:800;letter-spacing:-.03em;line-height:1;margin:.3rem 0 1rem}
+.ticket .cut{border-top:3px dashed var(--paper-ink);margin:1rem -1.5rem;opacity:.5}
+.ticket button{border-color:var(--paper-ink)}
+@keyframes slip{from{transform:translateY(-1.5rem) rotate(-2deg);opacity:0}}
+@media(prefers-reduced-motion:reduce){.ticket{animation:none}}
+footer{grid-column:1/-1;font-size:.9rem}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div>
+  <header class="mark">Little Lemon · Chicago</header>
+  <h1>Save a table for tonight.</h1>
+  <p class="lede">Dinner runs from 5 pm. Pick a day, then a time. Booked times disappear, and anything invalid tells you why.</p>
+  <section class="lab" aria-labelledby="lab-h">
+    <h2 id="lab-h">How it works, live</h2>
+    <dl>
+      <dt>Free times</dt><dd id="s-free"></dd>
+      <dt>Booked</dt><dd id="s-booked"></dd>
+      <dt>Validation</dt><dd id="s-errs"></dd>
+    </dl>
+    <p style="margin:0 0 .5rem;font-weight:700">Try to break it</p>
+    <div class="try">
+      <button type="button" data-try="past">Yesterday’s date</button>
+      <button type="button" data-try="zero">0 guests</button>
+      <button type="button" data-try="many">11 guests</button>
+      <button type="button" data-try="empty">No time</button>
+    </div>
+  </section>
+</div>
+
+<main>
+  <section class="panel" aria-labelledby="book-h">
+    <h2 id="book-h">Reserve a table</h2>
+    <form id="form" novalidate aria-label="Reserve a table">
+      <label for="date">Date</label>
+      <input type="date" id="date" name="date" required aria-describedby="date-err">
+      <p class="err" id="date-err" role="alert" hidden></p>
+
+      <fieldset id="timeset" aria-describedby="time-err">
+        <legend>Time</legend>
+        <div class="chips" id="chips"></div>
+        <p class="hint" id="none" hidden>No tables are free on this date. Try another day.</p>
+      </fieldset>
+      <p class="err" id="time-err" role="alert" hidden></p>
+
+      <label for="guests">Number of guests</label>
+      <div class="step">
+        <button type="button" id="minus" aria-label="One fewer guest">−</button>
+        <input type="number" id="guests" name="guests" min="1" max="10" required aria-describedby="guests-err">
+        <button type="button" id="plus" aria-label="One more guest">+</button>
+      </div>
+      <p class="err" id="guests-err" role="alert" hidden></p>
+
+      <label for="occasion">Occasion (optional)</label>
+      <select id="occasion" name="occasion"><option value="">None</option><option>Birthday</option><option>Anniversary</option></select>
+
+      <button class="go" type="submit">Reserve table</button>
+    </form>
+
+    <div class="ticket" id="ticket" role="status" hidden>
+      <div>Reservation</div>
+      <div class="big" id="t-when"></div>
+      <div id="t-detail"></div>
+      <div class="cut"></div>
+      <div id="t-code" style="font-variant-numeric:tabular-nums"></div>
+      <p><button type="button" id="again">Book another table</button></p>
+    </div>
+  </section>
+</main>
+<footer>Demo only. Bookings live in memory and reset when you reload.</footer>
+</div>
+
+<script>
+const MAX = 10, $ = (s) => document.querySelector(s);
+const pad = (n) => String(n).padStart(2, '0');
+const iso = (d) => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+const parse = (s) => new Date(s + 'T00:00:00');
+const rnd = (seed) => { const m = 2 ** 35 - 31, a = 185852; let s = seed % m; return () => (s = (s * a) % m) / m; };
+const fetchAPI = (d) => { const r = rnd(d.getDate()), o = []; for (let h = 17; h <= 23; h++) { if (r() < .5) o.push(h + ':00'); if (r() < .5) o.push(h + ':30'); } return o; };
+
+const st = { date: iso(new Date()), time: '', guests: '2', occasion: '', touched: {}, bookings: {} };
+const free = () => fetchAPI(parse(st.date)).filter((t) => !(st.bookings[st.date] || []).includes(t));
+
+function validate() {
+  const e = {}, today = iso(new Date()), n = Number(st.guests);
+  if (!st.date) e.date = 'Choose a date.';
+  else if (st.date < today) e.date = 'Choose today or a later date.';
+  if (!st.time) e.time = 'Choose a time.';
+  else if (!free().includes(st.time)) e.time = 'That time is no longer available. Choose another.';
+  if (st.guests === '' || !Number.isInteger(n)) e.guests = 'Enter a whole number of guests.';
+  else if (n < 1 || n > MAX) e.guests = 'Choose between 1 and ' + MAX + ' guests.';
+  return e;
+}
+
+function render() {
+  const errs = validate(), times = free();
+  $('#date').value = st.date; $('#guests').value = st.guests; $('#occasion').value = st.occasion;
+  $('#date').min = iso(new Date());
+  $('#chips').innerHTML = times.map((t) =>
+    '<label class="chip"><input type="radio" name="time" value="' + t + '"' + (t === st.time ? ' checked' : '') + '><span>' + t + '</span></label>').join('');
+  $('#none').hidden = times.length > 0;
+  ['date', 'time', 'guests'].forEach((f) => {
+    const show = st.touched[f] && errs[f], p = $('#' + f + '-err');
+    p.hidden = !show; p.textContent = show ? errs[f] : '';
+    const el = f === 'time' ? $('#timeset') : $('#' + f);
+    if (show) el.setAttribute('aria-invalid', 'true'); else el.removeAttribute('aria-invalid');
+  });
+  $('#s-free').textContent = times.length ? times.join(', ') : 'none';
+  const b = st.bookings[st.date] || [];
+  $('#s-booked').textContent = b.length ? b.join(', ') : 'none yet';
+  const all = Object.values(errs);
+  $('#s-errs').textContent = all.length ? all.join(' ') : 'valid, ready to book';
+}
+
+$('#date').addEventListener('change', (e) => { st.date = e.target.value; st.time = ''; st.touched.date = true; render(); });
+$('#guests').addEventListener('input', (e) => { st.guests = e.target.value; render(); });
+$('#guests').addEventListener('blur', () => { st.touched.guests = true; render(); });
+$('#occasion').addEventListener('change', (e) => { st.occasion = e.target.value; });
+$('#chips').addEventListener('change', (e) => { st.time = e.target.value; st.touched.time = true; render(); });
+$('#minus').addEventListener('click', () => { st.guests = String(Math.max(1, (Number(st.guests) || 2) - 1)); st.touched.guests = true; render(); });
+$('#plus').addEventListener('click', () => { st.guests = String(Math.min(MAX, (Number(st.guests) || 0) + 1)); st.touched.guests = true; render(); });
+
+$('#form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  st.touched = { date: true, time: true, guests: true };
+  render();
+  if (Object.keys(validate()).length) { const bad = document.querySelector('[aria-invalid=true]'); if (bad) (bad.matches('fieldset') ? bad.querySelector('input') || bad : bad).focus(); return; }
+  (st.bookings[st.date] = st.bookings[st.date] || []).push(st.time);
+  const d = parse(st.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  $('#t-when').textContent = st.time + ', ' + d;
+  $('#t-detail').textContent = 'Table for ' + st.guests + (st.occasion ? ' · ' + st.occasion : '');
+  $('#t-code').textContent = 'Code LL-' + Math.floor(1000 + Math.random() * 9000);
+  $('#form').hidden = true; $('#ticket').hidden = false;
+  render();
+});
+
+$('#again').addEventListener('click', () => {
+  Object.assign(st, { time: '', touched: {} });
+  $('#ticket').hidden = true; $('#form').hidden = false; render(); $('#date').focus();
+});
+
+document.querySelectorAll('[data-try]').forEach((btn) => btn.addEventListener('click', () => {
+  if ($('#form').hidden) $('#again').click();
+  const k = btn.dataset.try;
+  if (k === 'past') { const d = new Date(); d.setDate(d.getDate() - 1); st.date = iso(d); st.time = ''; }
+  if (k === 'zero') st.guests = '0';
+  if (k === 'many') st.guests = '11';
+  if (k === 'empty') st.time = '';
+  st.touched = { date: true, time: true, guests: true };
+  render();
+}));
+
+render();
+</script>
+</body>
+</html>
